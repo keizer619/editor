@@ -31,7 +31,10 @@ import io.swagger.parser.Swagger20Parser;
 import io.swagger.util.Json;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.apache.commons.lang3.StringUtils;
 import org.ballerinalang.composer.service.workspace.rest.datamodel.BLangJSONModelBuilder;
+import org.ballerinalang.composer.service.workspace.rest.datamodel.BallerinaComposerErrorStrategy;
+import org.ballerinalang.composer.service.workspace.rest.datamodel.BallerinaComposerModelBuilder;
 import org.ballerinalang.composer.service.workspace.swagger.generators.BallerinaCodeGenerator;
 import org.ballerinalang.model.Annotation;
 import org.ballerinalang.model.BLangPackage;
@@ -45,6 +48,7 @@ import org.ballerinalang.model.Service;
 import org.ballerinalang.model.SymbolName;
 import org.ballerinalang.model.Worker;
 import org.ballerinalang.model.builder.BLangModelBuilder;
+import org.ballerinalang.model.statements.VariableDefStmt;
 import org.ballerinalang.model.types.BTypes;
 import org.ballerinalang.model.types.SimpleTypeName;
 import org.ballerinalang.util.parser.BallerinaLexer;
@@ -102,12 +106,12 @@ public class SwaggerConverterUtils {
         BallerinaLexer ballerinaLexer = new BallerinaLexer(antlrInputStream);
         CommonTokenStream ballerinaToken = new CommonTokenStream(ballerinaLexer);
         BallerinaParser ballerinaParser = new BallerinaParser(ballerinaToken);
-        ballerinaParser.setErrorHandler(new BallerinaParserErrorStrategy());
+        ballerinaParser.setErrorHandler(new BallerinaComposerErrorStrategy());
         GlobalScope globalScope = GlobalScope.getInstance();
         BTypes.loadBuiltInTypes(globalScope);
         BLangPackage bLangPackage = new BLangPackage(globalScope);
         BLangPackage.PackageBuilder packageBuilder = new BLangPackage.PackageBuilder(bLangPackage);
-        BLangModelBuilder bLangModelBuilder = new BLangModelBuilder(packageBuilder, "");
+        BallerinaComposerModelBuilder bLangModelBuilder = new BallerinaComposerModelBuilder(packageBuilder, StringUtils.EMPTY);
         BLangAntlr4Listener ballerinaBaseListener = new BLangAntlr4Listener(bLangModelBuilder);
         ballerinaParser.addParseListener(ballerinaBaseListener);
         ballerinaParser.compilationUnit();
@@ -364,6 +368,9 @@ public class SwaggerConverterUtils {
         }
         for (Resource resource : ballerinaService.getResources()) {
             serviceBuilder.addResource(resource);
+        }
+        for (VariableDefStmt variableDefStmt : ballerinaService.getVariableDefStmts()) {
+            serviceBuilder.addVariableDef(variableDefStmt);
         }
         return serviceBuilder.buildService();
     }
