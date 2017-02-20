@@ -287,7 +287,14 @@ define(['lodash', 'log', './ballerina-view', './variables-view', './type-struct-
             var functionPackage = _.find(packages, function (aPackage) {
                 return aPackage.getFunctionDefinitionByName(funcName);
             });
-            var functionDef = functionPackage.getFunctionDefinitionByName(funcName);
+            //This fix is done bcz the packages array returned from package scope environment doesn't have 
+            // the current package populated correctly. The functions definitions are missing there.
+            var functionDef;
+            if (functionPackage) {
+                functionDef = functionPackage.getFunctionDefinitionByName(funcName);
+            } else {
+                functionDef = diagramRenderingContext.getPackagedScopedEnvironment().getCurrentPackage().getFunctionDefinitionByName(funcName);
+            }
             if (functionDef) {
                 schema = {};
                 schema['name'] = funcName;
