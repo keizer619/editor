@@ -69,7 +69,7 @@ define(['require', 'lodash', 'jquery', 'jsPlumb', 'dagre', 'alerts'], function (
                     length: 11
                 }],
                 ["Custom", {
-                    create: function (component) {
+                    create: function () {
                         return $("<select id='typeMapperList" + self.viewIdSeperator + self.viewId + "'></select>");
                     },
                     location: 0.5,
@@ -152,7 +152,7 @@ define(['require', 'lodash', 'jquery', 'jsPlumb', 'dagre', 'alerts'], function (
      * @returns {*}
      */
     TypeMapperRenderer.prototype.getStructId = function (propertyId) {
-        var id = propertyId.replace("jstree-container" + this.viewIdSeperator, "");
+        var id = propertyId.replace(this.jsTreePrefix + this.viewIdSeperator, "");
         return id.split(this.idNameSeperator)[0]
     };
 
