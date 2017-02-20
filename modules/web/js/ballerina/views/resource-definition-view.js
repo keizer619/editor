@@ -121,6 +121,8 @@ define(['lodash', 'log', 'd3', 'jquery', 'd3utils', './ballerina-view', './../as
 
         ResourceDefinitionView.prototype = Object.create(BallerinaView.prototype);
         ResourceDefinitionView.prototype.constructor = ResourceDefinitionView;
+        // TODO move variable types into constant class
+        var variableTypes = ['message', 'boolean', 'string', 'int', 'float', 'long', 'double', 'json', 'xml'];
 
         ResourceDefinitionView.prototype.init = function(){
             this._model.on('child-removed', this.childRemovedCallback, this);
@@ -304,7 +306,8 @@ define(['lodash', 'log', 'd3', 'jquery', 'd3utils', './ballerina-view', './../as
                     toolPalette: this.toolPalette,
                     messageManager: this.messageManager,
                     diagramRenderContext: this.getDiagramRenderingContext(),
-                    line: {height: lineHeight}
+                    line: {height: lineHeight},
+                    title: workerDeclaration.getWorkerName()
                 };
                 var workerDeclarationView = new WorkerDeclarationView(workerDeclarationOptions);
                 workerDeclarationView.setParent(this);
@@ -1244,13 +1247,15 @@ define(['lodash', 'log', 'd3', 'jquery', 'd3utils', './ballerina-view', './../as
 
             this.getConnectorWorkerViewList().forEach(function (worker) {
                 if (worker instanceof WorkerDeclarationView) {
-                    if (worker.getModel().id === currentWorker.getModel().id && dy < 0) {
-                        // TODO: Refactor logic
-                        // Child we are removing, have not removed from the view list yet
-                        lastChildArr.push(worker.getStatementContainer().getManagedStatements()[worker.getStatementContainer().getManagedStatements() - 2]);
-                    } else {
-                        lastChildArr.push(_.last(worker.getStatementContainer().getManagedStatements()));
-                    }
+                    // if (worker.getModel().id === currentWorker.getModel().id && dy < 0) {
+                    //     // TODO: Refactor logic
+                    //     // Child we are removing, have not removed from the view list yet
+                    //     lastChildArr.push(worker.getStatementContainer().getManagedStatements()[worker.getStatementContainer().getManagedStatements() - 2]);
+                    // } else {
+                    //     lastChildArr.push(_.last(worker.getStatementContainer().getManagedStatements()));
+                    // }
+                    // TODO: We need to rewrite this logic due to the current limitation of the element remove in statement container
+                    lastChildArr.push(_.last(worker.getStatementContainer().getManagedStatements()));
                 }
             });
 
