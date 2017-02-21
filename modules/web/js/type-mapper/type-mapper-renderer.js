@@ -799,10 +799,17 @@ define(['require', 'lodash', 'jquery', 'jsPlumb', 'dagre', 'alerts'], function (
 
             _.forEach(nodes, function (n) {
                 var nodeContent = $("#" + n.id);
-                if (maxTypeHeight < nodeContent.height()) {
-                    maxTypeHeight = nodeContent.height();
+                var height  = nodeContent.height();
+
+                if ( $("#" + n.id).attr('class').includes("struct")) {
+                    height = height + height/2;
                 }
-                graph.setNode(n.id, {width: nodeContent.width(), height: nodeContent.height()});
+
+                if (maxTypeHeight < height) {
+                    maxTypeHeight = height;
+                }
+
+                graph.setNode(n.id, {width: nodeContent.width(), height: height});
             });
 
             var edges = self.jsPlumbInstance.getAllConnections();
@@ -838,7 +845,6 @@ define(['require', 'lodash', 'jquery', 'jsPlumb', 'dagre', 'alerts'], function (
                 var node = $("#" + dagreNode);
                 node.css("left", graph.node(dagreNode).x + "px");
                 node.css("top", graph.node(dagreNode).y + "px");
-                // }
 
                 if (graph.node(dagreNode) != null && graph.node(dagreNode).y > maxYPosition) {
                     maxYPosition = graph.node(dagreNode).y;
